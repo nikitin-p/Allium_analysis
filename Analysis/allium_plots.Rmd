@@ -1,0 +1,96 @@
+---
+title: Adaptive evolution of chloroplast genes in Allioideae (_Amaryllidaceae_) species
+  adapted to contrasting habitats
+author: "Pavel A. Nikitin, Ilya V. Artyushin"
+date: "14/02/2021"
+output:
+  html_document: default
+  pdf_document: default
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=TRUE}
+require("knitr")
+opts_knit$set(root.dir = ".")
+knitr::opts_chunk$set(echo = TRUE)
+stringsAsFactors = F
+library("readxl")
+library(tidyverse)
+```
+
+### Gaps plot
+```{r}
+gaps <- read_excel("../data/plot_gaps.xlsx")
+ggplot(data = gaps, mapping = aes(x = Position_in_alignment, y = Share_of_gaps_in_alignment)) + theme(legend.position="right") +
+  geom_point(alpha=0.6, color = "blue", size = 0.4) +
+  geom_line(alpha=0.6, color = "blue", size = 0.2) +
+  geom_vline(xintercept=0, color = "black", size=0.3) +
+  geom_vline(xintercept=189000, color = "black", size=0.3) +
+  geom_vline(xintercept=103613, color = "black", size=0.3) +
+  geom_vline(xintercept=132031, color = "black", size=0.3) +
+  geom_vline(xintercept=154628, color = "black", size=0.3) +
+  labs(x = "Position in alignment", y = "Share of gaps in alignment")
+#ggsave("../data/plot_gaps.png", width = 30, height = 10, scale = 1,  units = c("cm"), dpi = 500, limitsize = FALSE,)
+```
+
+### GC-content plot
+```{r}
+gc <- read_excel("../data/plot_gc.xlsx")
+gc %>% head(5)
+ggplot(data = gc, mapping = aes(x = Position_in_alignment, y = GC_content_along_alignment)) + theme(legend.position="right") +
+  geom_point(alpha=0.6, color = "red", size = 0.5) +
+  geom_smooth(alpha=0.6, color = "red", fill=NA, size = 0.5) +
+  geom_line(alpha=0.6, color = "red", size = 0.1) +
+  geom_hline(yintercept=0.5, color = "blue", size=0.3) +
+  geom_vline(xintercept=0, color = "black", size=0.3) +
+  geom_vline(xintercept=189000, color = "black", size=0.3) +
+  geom_vline(xintercept=103613, color = "black", size=0.3) +
+  geom_vline(xintercept=132031, color = "black", size=0.3) +
+  geom_vline(xintercept=154628, color = "black", size=0.3) +
+  labs(x = "Position in alignment", y = "GC content in window")
+#ggsave("../data/plot_gc.png", width = 30, height = 10, scale = 1,  units = c("cm"), dpi = 500, limitsize = FALSE,)
+```
+
+### Relative tree length plot
+```{r}
+windows <- read_excel("../data/plot_window.xlsx")
+windows %>% head(5)
+ggplot(data = windows, mapping = aes(x = Position_in_alignment, y = Rel_len)) + theme(legend.position="right") +
+  geom_point(alpha=0.6, color = "orange", size = 0.7) + 
+  geom_line(alpha=0.6, color = "orange", size = 0.4) +
+  geom_vline(xintercept=0, color = "black", size=0.3) +
+  geom_vline(xintercept=189000, color = "black", size=0.3) +
+  geom_vline(xintercept=103613, color = "black", size=0.3) +
+  geom_vline(xintercept=132031, color = "black", size=0.3) +
+  geom_vline(xintercept=154628, color = "black", size=0.3) +
+  labs(x = "Position in alignment", y = "Relative tree length")
+#ggsave("../data/plot_window.png", width = 30, height = 10, scale = 1,  units = c("cm"), dpi = 500, limitsize = FALSE,)
+```
+
+### GC, dN/dS-MEME and relative mutation rate plot
+```{r}
+iqtree <- read_excel("../data/plot_iqtree.xlsx")
+ggplot(data = iqtree) + theme(legend.position="right") +
+  geom_bar(mapping = aes(x = Center-500, y = Rate), color = "black", stat = "identity", width=1000, alpha=1, fill = "#54bdc2", size = 0.1, position = "dodge") + 
+  geom_bar(mapping = aes(x = Center+500, y = dnds_MEME), color = "black", stat = "identity", width=1000, alpha=1, fill = "#e87d72", size = 0.1, position = "dodge") +
+  geom_point(mapping = aes(x = Center, y = GC_estimate), alpha=1, color = "#1818d0", size = 0.9) +
+  geom_line(mapping = aes(x = Center, y = GC_estimate), alpha=0.6, color = "#1818d0", size = 0.3) +
+  labs(x = "Position in alignment", y = "Relative mutation rate (teal), dN/dS-MEME\n rate (brick-red) and gene GC-content (blue)") +
+  geom_vline(xintercept=0, color = "black", size=0.3) +
+  geom_vline(xintercept=189000, color = "black", size=0.3) +
+  geom_vline(xintercept=103613, color = "black", size=0.3) +
+  geom_vline(xintercept=132031, color = "black", size=0.3) +
+  geom_vline(xintercept=154628, color = "black", size=0.3)
+#ggsave("../data/plot_iqtree.png", width = 30, height = 10, scale = 1,  units = c("cm"), dpi = 1000, limitsize = FALSE,)
+```
+
+### Gene scale
+```{r}
+gene_scale <- read_excel("../data/gene_scale.xlsx")
+ggplot(data = gene_scale, mapping = aes(x = Position, y = Position)) +
+  geom_point() +
+  theme(axis.text.x = element_text(angle=90, hjust = 1, size = 5)) +
+  scale_x_continuous(breaks = gene_scale$Position,labels = gene_scale$Gene )
+#ggsave("../data/gene_scale.png", width = 30, height = 10, scale = 1,  units = c("cm"), dpi = 1000, limitsize = FALSE,)
+```
